@@ -4,9 +4,13 @@ from PIL import Image
 import base64
 import imagehash
 from io import BytesIO
+import os
 
 import base64
 from web3 import Web3
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # from hashImage import hashImage
@@ -14,9 +18,6 @@ from web3 import Web3
 # hasher = hashImage()
 
 
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
 INFURA_KEY = os.getenv("INFURA_KEY")
 METAMASK_PRIVATE_KEY = os.getenv("METAMASK_PRIVATE_KEY")

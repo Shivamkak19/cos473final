@@ -5,3 +5,16 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 })
+
+
+module.exports = defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        bot: './bot.html'
+      },
+    },
+    outDir: 'dist',
+  },
+});

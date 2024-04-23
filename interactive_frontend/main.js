@@ -2,7 +2,7 @@ import './style.css';
 
 var base64StringList = [];
 
-var dev = true
+var dev = false
 var host
 
 // Set host based on hosting
@@ -10,7 +10,7 @@ if (dev == true){
     host = "http://127.0.0.1:5000";
 }
 else{
-    host = "google.com"
+    host = "https://cos473final-backend.onrender.com"
 }
 
 var hashRoute = "cos473/get_image_hash/";
