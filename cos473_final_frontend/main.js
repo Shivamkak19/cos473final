@@ -1,113 +1,116 @@
-import './style.css'
+import './style.css';
 
-var base64String
-var server
-var dev = true
+const base64StringList = [];
+const server = "http://127.0.0.1:5000"; // Change to your server URL
+const hashRoute = "cos473/get_image_hash/";
+const validateRoute = "cos473/image_vault_query/";
+const readAllRoute = "cos473/image_vault_read_all/";
 
-if (dev == true){
-  server = "http://127.0.0.1:5000"
-}
-else{
-  server = "google.com"
-}
-
-var hash_route = "cos473/get_image_hash/"
-var validate_route = "cos473/image_vault_query/"
-var read_all_route = "cos473/image_vault_read_all/"
-
-// Add event listeners to trigger functions on button clicks
-document.getElementById('main-button').addEventListener("click", validateNFT)
-document.getElementById('main-button2').addEventListener("click", readAllNFTs)
-
-// Add event listener to check for change in image file upload
+// Function to handle image upload
 document.getElementById('uploadInput').addEventListener('change', function(event) {
-  const file = event.target.files[0]; // Get the uploaded file
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const blob = new Blob([event.target.result], { type: file.type }); // Convert the image to Blob
-    // Read the blob as a data URL
-    const dataURLReader = new FileReader();
-    dataURLReader.onload = function() {
-      base64String = dataURLReader.result; // Get the base64 encoded string
-      console.log("Base64:", base64String); // Log the base64 encoded string
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const base64String = event.target.result.split(',')[1];
+        base64StringList.push(base64String);
+        document.querySelector('.custom-file-label').innerText = file.name;
     };
-    dataURLReader.readAsDataURL(blob);
-  };
-  reader.readAsArrayBuffer(file); // Read the uploaded file as an ArrayBuffer
+    reader.readAsDataURL(file);
 });
 
-// private function used to hash given image using python PIL 
-async function setImageHash() {
-  console.log("gate 2", base64String)
-  try {
-      const response = await fetch(`${server}/${hash_route}`, {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(base64String)
-      });
-      if (!response.ok) {
-          throw new Error("Failed to upload image.");
-      }
+// Function to validate uploaded image
+document.getElementById('validateImageButton').addEventListener('click', async function() {
+    if (base64StringList.length === 0) {
+        alert("Please upload an image first.");
+        return;
+    }
 
-      const data = await response.json();
-      const imageHash = data.image_hash;
-      console.log("Image Hash:", imageHash);
-      return imageHash
-  } catch (error) {
-      console.error("Error creating NFT:", error);
-      return ""
-  }
+    const imageHashList = await setImageHash(base64StringList);
+    console.log("Image Hash List:", imageHashList);
+
+    // Validate each image hash
+    for (const imageHash of imageHashList) {
+        await validateNFT(imageHash);
+    }
+});
+
+// Function to read all NFTs
+document.getElementById('readAllImagesButton').addEventListener('click', async function() {
+    const validatedImageHashList = await readAllNFTs();
+    console.log("Validated Image Hash List:", validatedImageHashList);
+
+    // Display the list of validated image hashes
+    const nftList = document.getElementById('nftList');
+    nftList.innerHTML = "";
+    validatedImageHashList.forEach((imageHash, index) => {
+        const listItem = document.createElement('li');
+        listItem.className = "list-group-item";
+        listItem.textContent = `NFT ${index + 1}: ${imageHash}`;
+        nftList.appendChild(listItem);
+    });
+});
+
+// Function to hash the uploaded image
+async function setImageHash(base64StringList) {
+    const imageHashList = [];
+    for (const base64String of base64StringList) {
+        try {
+            const response = await fetch(`${server}/${hashRoute}`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(base64String)
+            });
+            if (!response.ok) {
+                throw new Error("Failed to hash image.");
+            }
+            const data = await response.json();
+            imageHashList.push(data.image_hash);
+        } catch (error) {
+            console.error("Error hashing image:", error);
+            imageHashList.push("");
+        }
+    }
+    return imageHashList;
 }
 
-// public function used to validate image based on given upload
-async function validateNFT() {
-
-  // call private helper to hash image with python PIL
-  const image_hash = await setImageHash()
-
-  try {
-      const response = await fetch(`${server}/${validate_route}`, {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(image_hash)
-      });
-
-      if (!response.ok) {
-          throw new Error("Failed to proceed with validation process");
-      }
-
-      const data = await response.json();
-      const validation_status = data.value;
-      console.log("Image Hash:", validation_status);
-      return validation_status
-  } catch (error) {
-      console.error("Error creating NFT:", error);
-      return ""
-  }
-}
-
-// public function to read all NFTS in authenticated collection
-async function readAllNFTs() {
+// Function to validate the image hash
+async function validateNFT(imageHash) {
     try {
-        const response = await fetch(`${server}/${read_all_route}`, {
+        const response = await fetch(`${server}/${validateRoute}`, {
             method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(imageHash)
+        });
+        if (!response.ok) {
+            throw new Error("Failed to validate image.");
+        }
+        const data = await response.json();
+        console.log("Image Validation Result:", data.value);
+    } catch (error) {
+        console.error("Error validating image:", error);
+    }
+}
+
+// Function to read all NFTs
+async function readAllNFTs() {
+    try {
+        const response = await fetch(`${server}/${readAllRoute}`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
             },
         });
         if (!response.ok) {
-            throw new Error("Failed to proceed with validation process");
+            throw new Error("Failed to read all NFTs.");
         }
         const data = await response.json();
-        const validated_image_hash_list = data.values;
-        console.log("Image Hash:", validated_image_hash_list);
-        return validated_image_hash_list
+        return data.values || [];
     } catch (error) {
-        console.error("Error creating NFT:", error);
-        return ""
+        console.error("Error reading all NFTs:", error);
+        return [];
     }
 }

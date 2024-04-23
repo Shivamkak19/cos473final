@@ -4,23 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFT App</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>NFT App</h1>
+    <div class="container mt-5">
+        <h1 class="mb-4">NFT App</h1>
 
-    <!-- Image Upload Button -->
-    <input type="file" id="uploadInput" style="display: none;">
-    <button class="upload-btn" onclick="document.getElementById('uploadInput').click();">Upload Image</button>
-    <span id="selectedImage"></span><br>
+        <!-- Image Upload Button -->
+        <div class="custom-file mb-3">
+            <input type="file" class="custom-file-input" id="uploadInput">
+            <label class="custom-file-label" for="uploadInput">Choose Image</label>
+        </div>
 
-    <!-- Create NFT Button -->
-    <button class="create-btn" id = "main-button">Validate</button>
-    <button class="create-btn" id = "main-button2">Read All</button>
+        <!-- Buttons for Validation and Read All Images -->
+        <button class="btn btn-primary mb-3" id="validateImageButton">Validate Image</button>
+        <button class="btn btn-secondary mb-3" id="readAllImagesButton">Read All Images</button>
 
-    <!-- List to display NFTs -->
-    <h2>Read All NFTs</h2>
-    <ul id="nftList"></ul>
-    
+        <!-- List to Display NFTs -->
+        <h2>Read All NFTs</h2>
+        <ul id="nftList" class="list-group"></ul>
+    </div>
 
     <script src="main.js" type="module"></script>
 </body>
