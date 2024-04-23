@@ -1,0 +1,74 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: transparent;
+  color: #fff; /* Set text color to white */
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  border: 2px solid #fff; /* White border */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+h1 {
+  text-align: center;
+  color: #fff; /* White text color */
+}
+
+.custom-file-label::after {
+  content: "Choose File";
+}
+
+.upload-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  font-weight: bold; /* Bold font weight */
+}
+
+.create-btn {
+  width: 49%;
+  margin-right: 2%;
+  font-weight: bold; /* Bold font weight */
+}
+
+.list-group-item {
+  margin-top: 5px;
+  background-color: #00000038;
+  font-weight: bold; /* Bold font weight */
+}
+
+.image-cell {
+  border: 2px solid #fff; /* White border */
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: rgba(255, 255, 255, 0.1); /* Transparent white background */
+}
+
+.btn-primary{
+  background-color: rgba(4, 0, 53, 0.337);
+}
+
+.mt-3{
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: rgba(4, 0, 53, 0.337);
+}
+
+.validation-result,
+.nft-list-item {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff; /* White text color */
+}
+
+#uploadedImagesContainer {
+  margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}

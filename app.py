@@ -3,7 +3,6 @@ from flask_cors import CORS
 from PIL import Image
 import base64
 import imagehash
-import io
 from io import BytesIO
 
 import base64
