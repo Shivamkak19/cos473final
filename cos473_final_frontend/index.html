@@ -10,19 +10,27 @@
     <div class="container mt-5">
         <h1 class="mb-4">NFT App</h1>
 
-        <!-- Image Upload Button -->
-        <div class="custom-file mb-3">
-            <input type="file" class="custom-file-input" id="uploadInput">
-            <label class="custom-file-label" for="uploadInput">Choose Image</label>
-        </div>
+    <!-- Image Upload Button -->
+    <div class="custom-file mb-3">
+      <input type="file" class="custom-file-input" id="uploadInput" multiple>
+      <label class="custom-file-label" for="uploadInput">Choose Image</label>
+    </div>
 
-        <!-- Buttons for Validation and Read All Images -->
-        <button class="btn btn-primary mb-3" id="validateImageButton">Validate Image</button>
-        <button class="btn btn-secondary mb-3" id="readAllImagesButton">Read All Images</button>
+    <!-- Uploaded Images Container -->
+    <div id="uploadedImagesContainer" class="mb-3"></div>
 
-        <!-- List to Display NFTs -->
-        <h2>Read All NFTs</h2>
-        <ul id="nftList" class="list-group"></ul>
+    <!-- Buttons for Validation and Read All Images -->
+    <button class="btn btn-primary mb-3" id="validateImageButton">Validate Image</button>
+    <button class="btn btn-secondary mb-3" id="readAllImagesButton">Read All Images</button>
+
+    <!-- Validation Results Container -->
+    <div id="validationResults" class="mb-3"></div>
+
+    <!-- List to Display NFTs -->
+    <h2>Read All NFTs</h2>
+    <ul id="nftList" class="list-group"></ul>
+
+
     </div>
 
     <script src="main.js" type="module"></script>

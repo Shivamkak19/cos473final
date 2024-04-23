@@ -1,37 +1,67 @@
 import './style.css';
 
-const base64StringList = [];
-const server = "http://127.0.0.1:5000"; // Change to your server URL
-const hashRoute = "cos473/get_image_hash/";
-const validateRoute = "cos473/image_vault_query/";
-const readAllRoute = "cos473/image_vault_read_all/";
+var base64StringList = [];
+var server = "http://127.0.0.1:5000"; // Change to your server URL
+var hashRoute = "cos473/get_image_hash/";
+var validateRoute = "cos473/image_vault_query/";
+var readAllRoute = "cos473/image_vault_read_all/";
 
 // Function to handle image upload
 document.getElementById('uploadInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const base64String = event.target.result.split(',')[1];
-        base64StringList.push(base64String);
-        document.querySelector('.custom-file-label').innerText = file.name;
-    };
-    reader.readAsDataURL(file);
+  const files = event.target.files;
+  for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = function(event) {
+          const base64String = event.target.result;
+          displayImage(file.name, base64String); // Display the image
+          base64StringList.push({ file, base64String }); // Store the image and its base64 string
+          document.querySelector('.custom-file-label').innerText = "Uploaded images: " + base64StringList.length;
+      };
+      reader.readAsDataURL(file);
+  }
 });
+
+// Function to display the uploaded image
+function displayImage(fileName, base64String) {
+  const imageDiv = document.createElement('div');
+  imageDiv.classList.add('uploaded-image');
+  imageDiv.innerHTML = `<img src="${base64String}" class="img-fluid" alt="${fileName}">`;
+  document.getElementById('uploadedImagesContainer').appendChild(imageDiv);
+}
+
+// Function to remove uploaded image from the queue
+function removeUploadedImage(index) {
+  base64StringList.splice(index, 1);
+  const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
+  uploadedImagesContainer.removeChild(uploadedImagesContainer.children[index]);
+}
 
 // Function to validate uploaded image
 document.getElementById('validateImageButton').addEventListener('click', async function() {
-    if (base64StringList.length === 0) {
-        alert("Please upload an image first.");
-        return;
-    }
+  if (base64StringList.length === 0) {
+      alert("Please upload an image first.");
+      return;
+  }
 
-    const imageHashList = await setImageHash(base64StringList);
-    console.log("Image Hash List:", imageHashList);
+  const current_len = base64StringList.length
+  for (let i = 0; i < current_len; i++) {
+    console.log("YO:", i)
 
-    // Validate each image hash
-    for (const imageHash of imageHashList) {
-        await validateNFT(imageHash);
-    }
+      // List elements will be popped from front, so always access at 0 index
+      const base64String = base64StringList[0].base64String
+      const file = base64StringList[0].file
+
+      const imageHash = await setImageHash(base64String);
+      console.log("Image Hash List:", imageHash);
+
+      // Validate each image hash
+      const validation_status = await validateNFT(imageHash);
+      displayValidationResult(file.name, validation_status);
+
+      // Remove the uploaded image from the display
+      removeUploadedImage(0);
+  }
 });
 
 // Function to read all NFTs
@@ -51,9 +81,7 @@ document.getElementById('readAllImagesButton').addEventListener('click', async f
 });
 
 // Function to hash the uploaded image
-async function setImageHash(base64StringList) {
-    const imageHashList = [];
-    for (const base64String of base64StringList) {
+async function setImageHash(base64String) {
         try {
             const response = await fetch(`${server}/${hashRoute}`, {
                 method: "POST",
@@ -66,13 +94,11 @@ async function setImageHash(base64StringList) {
                 throw new Error("Failed to hash image.");
             }
             const data = await response.json();
-            imageHashList.push(data.image_hash);
+            return data.image_hash
         } catch (error) {
             console.error("Error hashing image:", error);
-            imageHashList.push("");
+            return ""
         }
-    }
-    return imageHashList;
 }
 
 // Function to validate the image hash
@@ -113,4 +139,14 @@ async function readAllNFTs() {
         console.error("Error reading all NFTs:", error);
         return [];
     }
+}
+
+// Function to display validation result
+function displayValidationResult(fileName, status) {
+  const resultContainer = document.getElementById('validationResults');
+  const statusText = status ? "true" : "false";
+  const resultText = `Validation status of ${fileName}: ${statusText}`;
+  const resultDiv = document.createElement('div');
+  resultDiv.textContent = resultText;
+  resultContainer.appendChild(resultDiv);
 }
