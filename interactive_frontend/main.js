@@ -10,8 +10,8 @@ if (dev == true){
     host = "http://127.0.0.1:5000";
 }
 else{
-    // host = "https://cos473final-backend.onrender.com"
-    host = "http://0.0.0.0:10000"
+    host = "https://cos473final-backend.onrender.com"
+    // host = "http://0.0.0.0:10000"
 }
 
 var hashRoute = "cos473/get_image_hash/";
