@@ -3,3 +3,4 @@ flask_cors
 pillow
 imagehash
 web3
+dotenv
