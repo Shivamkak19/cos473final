@@ -121,5 +121,4 @@ def read_all_image_vault():
               
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 4000))
-    app.run(port=port)
+    app.run()
