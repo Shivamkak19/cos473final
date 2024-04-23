@@ -1,5 +1,10 @@
 import './style.css'
 
+// var Web3 = require('web3');
+require('dotenv').config();
+console.log(process.env);
+
+
 var base64String
 var server
 var dev = true
@@ -12,6 +17,31 @@ else{
 }
 
 var route = "cos473/get_image_hash/"
+
+// Contract address and ABI
+var contractAddress = process.env.IMAGE_VAULT_CONTRACT_ADDRESS;
+var abi = process.env.IMAGE_VAULT_CONTRACT_ABI;
+
+// Initialize web3
+const network = process.env.ETHEREUM_NETWORK;
+var web3 = new Web3(
+  new Web3.providers.HttpProvider(
+    `https://${network}.infura.io/v3/${process.env.INFURA_API_KEY}`,
+  ),
+);
+
+// Initialize contract instance
+var contract = new web3.eth.Contract(abi, contractAddress);
+
+// Function to validate image
+async function validateImage(image_hash_query) {
+    try {
+        const result = await contract.methods.hasText(image_hash_query).call();
+        console.log("Image Validation Result:", result);
+    } catch (error) {
+        console.error("Error validating image:", error);
+    }
+}
 
 document.getElementById('uploadInput').addEventListener('change', function(event) {
   const file = event.target.files[0]; // Get the uploaded file
@@ -33,10 +63,10 @@ document.getElementById('uploadInput').addEventListener('change', function(event
 });
 
 
-document.getElementById('main-button').addEventListener("click", createNFT)
+document.getElementById('main-button').addEventListener("click", setImageHash)
 
 
-async function createNFT() {
+async function setImageHash() {
   console.log("gate 2", base64String)
 
   try {
@@ -61,6 +91,11 @@ async function createNFT() {
   } catch (error) {
       console.error("Error creating NFT:", error);
   }
+}
+
+async function validateNFT() {
+
+
 }
 
 async function readAllNFTs() {

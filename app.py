@@ -6,8 +6,12 @@ import imagehash
 import io
 from io import BytesIO
 
-
 import base64
+
+# from hashImage import hashImage
+
+# hasher = hashImage()
+
 
 def isBase64(sb):
         try:
@@ -44,8 +48,15 @@ def get_image_hash():
     im_file = BytesIO(im_bytes)  # convert image to file-like object
     img = Image.open(im_file)   # img is now PIL Image object
 
+    # Create instance of hasher
+    # metadata = hasher.get_image_metadata(image_base64)
+    # print(metadata)
+    # print(hasher.hash_metadata(metadata))
+    # print()
+
     # Compute the image hash
     image_hash = imagehash.average_hash(img)
+    # image_hash = hasher.generate_metadata_hash(image_base64)
 
     ret = {
         "image_blob": image_base64,
