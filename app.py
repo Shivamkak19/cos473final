@@ -17,17 +17,15 @@ load_dotenv()
 
 # hasher = hashImage()
 
-
-
 INFURA_KEY = os.getenv("INFURA_KEY")
 METAMASK_PRIVATE_KEY = os.getenv("METAMASK_PRIVATE_KEY")
 METAMASK_PUBLIC_KEY = os.getenv("METAMASK_PUBLIC_KEY")
 IMAGE_VAULT_ADDRESS = os.getenv("IMAGE_VAULT_CONTRACT_ADDRESS")
 IMAGE_VAULT_ABI = os.getenv("IMAGE_VAULT_CONTRACT_ABI")
 
-print("Infura: %s\n Metamask public: %s\n Metamask private: %s\n" % 
-      (INFURA_KEY, METAMASK_PUBLIC_KEY, METAMASK_PRIVATE_KEY)
-      )
+# print("Infura: %s\n Metamask public: %s\n Metamask private: %s\n" % 
+    #   (INFURA_KEY, METAMASK_PUBLIC_KEY, METAMASK_PRIVATE_KEY)
+    #   )
 
 w3 = Web3(Web3.HTTPProvider(f'https://sepolia.infura.io/v3/{INFURA_KEY}'))
 
@@ -40,8 +38,8 @@ image_vault_contract = w3.eth.contract(address=address, abi=IMAGE_VAULT_ABI)
 
 val = image_vault_contract.functions.getAllTextValues().call()
 
-print("TESTING:", val)
-print(type(val))
+# print("TESTING:", val)
+# print(type(val))
 
 def isBase64(sb):
         try:
@@ -61,17 +59,17 @@ CORS(app)
 
 @app.route("/cos473/get_image_hash/", methods=["POST"])
 def get_image_hash():
-    print("GATE 10")
+    # print("GATE 10")
 
     image_base64 = request.json
 
     # remove "........base64,"
     image_base64 = image_base64.split("base64,",1)[1]
 
-    print(image_base64)
+    # print(image_base64)
 
     if not isBase64(image_base64):
-        print("error: invalid image provided")
+        # print("error: invalid image provided")
         return jsonify({"error": "No image data provided"})
 
     im_bytes = base64.b64decode(image_base64)   # im_bytes is a binary image
@@ -123,5 +121,5 @@ def read_all_image_vault():
               
 
 if __name__ == "__main__":
-    port = 4000 
+    port = int(os.environ.get('PORT', 4000))
     app.run(port=port)
