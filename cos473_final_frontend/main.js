@@ -14,13 +14,15 @@ document.getElementById('uploadInput').addEventListener('change', function(event
       const reader = new FileReader();
       reader.onload = function(event) {
           const base64String = event.target.result;
+          const uploadTime = new Date().toLocaleString(); // Get current time
           displayImage(file.name, base64String); // Display the image
-          base64StringList.push({ file, base64String }); // Store the image and its base64 string
+          base64StringList.push({ file, base64String, uploadTime }); // Store the image, base64 string, and upload time
           document.querySelector('.custom-file-label').innerText = "Uploaded images: " + base64StringList.length;
       };
       reader.readAsDataURL(file);
   }
 });
+
 
 // Function to display the uploaded image
 function displayImage(fileName, base64String) {
@@ -51,13 +53,14 @@ document.getElementById('validateImageButton').addEventListener('click', async f
       // List elements will be popped from front, so always access at 0 index
       const base64String = base64StringList[0].base64String
       const file = base64StringList[0].file
+      const upload_time = base64StringList[0].uploadTime
 
       const imageHash = await setImageHash(base64String);
       console.log("Image Hash List:", imageHash);
 
       // Validate each image hash
       const validation_status = await validateNFT(imageHash);
-      displayValidationResult(file.name, validation_status);
+      displayValidationResult(file.name, validation_status, upload_time);
 
       // Remove the uploaded image from the display
       removeUploadedImage(0);
@@ -116,8 +119,10 @@ async function validateNFT(imageHash) {
         }
         const data = await response.json();
         console.log("Image Validation Result:", data.value);
+        return data
     } catch (error) {
         console.error("Error validating image:", error);
+        return false
     }
 }
 
@@ -142,11 +147,43 @@ async function readAllNFTs() {
 }
 
 // Function to display validation result
-function displayValidationResult(fileName, status) {
+function displayValidationResult(fileName, status, upload_time) {
+
+  console.log("check status:", status)
   const resultContainer = document.getElementById('validationResults');
-  const statusText = status ? "true" : "false";
-  const resultText = `Validation status of ${fileName}: ${statusText}`;
-  const resultDiv = document.createElement('div');
-  resultDiv.textContent = resultText;
-  resultContainer.appendChild(resultDiv);
+
+  // Create table if it doesn't exist
+  if (!document.getElementById('validationTable')) {
+      const table = document.createElement('table');
+      table.id = 'validationTable';
+      table.className = 'table table-bordered mt-3';
+      
+      // Create table header
+      const thead = document.createElement('thead');
+      thead.innerHTML = `
+          <tr>
+              <th scope="col">File Name</th>
+              <th scope="col">Upload Time</th>
+              <th scope="col">Status</th>
+          </tr>
+      `;
+      table.appendChild(thead);
+
+      // Create table body
+      const tbody = document.createElement('tbody');
+      tbody.id = 'validationTableBody';
+      table.appendChild(tbody);
+
+      resultContainer.appendChild(table);
+  }
+
+  // Append validation result to table
+  const tbody = document.getElementById('validationTableBody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+      <td>${fileName}</td>
+      <td>${upload_time}</td>
+      <td>${status.value ? 'Valid' : 'Invalid'}</td>
+  `;
+  tbody.appendChild(row);
 }
