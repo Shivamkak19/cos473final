@@ -10,6 +10,11 @@ import base64
 from web3 import Web3
 from dotenv import load_dotenv
 
+# packages import for cryptography
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+
 load_dotenv()
 
 
@@ -120,46 +125,69 @@ def read_all_image_vault():
     return jsonify(ret)
 
 
-# //////////////////////////////////////////////////////////////////////
-# //////////////////////////////////////////////////////////////////////
-# //////////////////////////////////////////////////////////////////////
+
+# Helper functions for unsigning signature and deserializing public key
+# Function to deserialize the public key
+def deserialize_public_key(pem):
+    public_key = serialization.load_pem_public_key(pem.encode('utf-8'))
+    return public_key
+
+# Function to unsign the signature
+def unsign_signature(public_key, signature):
+    try:
+        # Decrypt signature to get the original hash (unsign)
+        original_hash = public_key.decrypt(
+            bytes.fromhex(signature),
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        return original_hash.hex()
+    except Exception as e:
+        print(f"Decryption failed: {e}")
+        return None
+    
+
 @app.route("/cos473/image_vault_mint/", methods = ["POST"])
 def image_vault_validate_mint():
     #   input schema
     # {
-    #      "image_hash": "...",
-    #      "public_key": "..."
+    #      "public_key": "...",
+    #      "signature": "..."
     # }
 
     request_args = request.json
-    image_hash = request_args["image_hash"]
-    public_key = request_args["public_key"]
+    public_key_pem = request_args["public_key"]
+    signature = request_args["signature"]
 
-    validation_status = False
+    # Deserialize public key
+    public_key = deserialize_public_key(public_key_pem)
+
+    # Unsign signature to retrieve image hash
+    original_hash = unsign_signature(public_key, signature)
 
     # ##################################################################
     # ##################################################################
-    # TODO: set validation_status true if authorized:
-    # else return False
+    # Assumption: an invalid signature will produce an original_hash
+    # that does not map to a meaningful image
+    # Thus, it is okay to mint to the contract 
+    # in excess even for invalid signatures
 
-
-
-    # END TODO
-    # ##################################################################
-    # ##################################################################
-
-    if validation_status is False:
+    if original_hash:
+        # user is authorized, proceed to mint NFT
+        image_vault_contract.functions.createNFT(original_hash).call()
+        ret = {
+            "status": True,
+        }
+    else:
         ret = {
             "status": False,
         }
-        return jsonify(ret)
-
-    # user is authorized, proceed to mint NFT
-    image_vault_contract.functions.createNFT(image_hash).call()
-    ret = {
-        "status": True,
-    }
+    
     return jsonify(ret)
+
               
 
 if __name__ == "__main__":
