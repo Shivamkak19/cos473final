@@ -118,6 +118,48 @@ def read_all_image_vault():
         }
 
     return jsonify(ret)
+
+
+# //////////////////////////////////////////////////////////////////////
+# //////////////////////////////////////////////////////////////////////
+# //////////////////////////////////////////////////////////////////////
+@app.route("/cos473/image_vault_mint/", methods = ["POST"])
+def image_vault_validate_mint():
+    #   input schema
+    # {
+    #      "image_hash": "...",
+    #      "public_key": "..."
+    # }
+
+    request_args = request.json
+    image_hash = request_args["image_hash"]
+    public_key = request_args["public_key"]
+
+    validation_status = False
+
+    # ##################################################################
+    # ##################################################################
+    # TODO: set validation_status true if authorized:
+    # else return False
+
+
+
+    # END TODO
+    # ##################################################################
+    # ##################################################################
+
+    if validation_status is False:
+        ret = {
+            "status": False,
+        }
+        return jsonify(ret)
+
+    # user is authorized, proceed to mint NFT
+    image_vault_contract.functions.createNFT(image_hash).call()
+    ret = {
+        "status": True,
+    }
+    return jsonify(ret)
               
 
 if __name__ == "__main__":
