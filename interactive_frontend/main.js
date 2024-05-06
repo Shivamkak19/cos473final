@@ -2,7 +2,7 @@ import './style.css';
 
 var base64StringList = [];
 
-var dev = false
+var dev = true
 var host
 
 // Set host based on hosting

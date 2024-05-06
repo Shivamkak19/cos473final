@@ -5,3 +5,4 @@ imagehash
 web3
 python-dotenv
 gunicorn
+cryptography
